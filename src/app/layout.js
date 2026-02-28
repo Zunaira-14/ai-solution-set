@@ -15,12 +15,12 @@
 // 
 import "./globals.css";
 import Navbar from "@/app/components/Navbar";
-// import connectDB from "@/app/lib/mongodb";
+import connectDB from "@/app/lib/mongodb";
 import Footer from "./components/Footer"; 
 // import StatsSection from "./StatsSection.js/page";
 
 export default async function RootLayout({ children }) {
-  // await connectDB(); // try-catch ki zarurat nahi agar env sahi ho
+  await connectDB(); // try-catch ki zarurat nahi agar env sahi ho
 
   return (
     <html lang="en">
