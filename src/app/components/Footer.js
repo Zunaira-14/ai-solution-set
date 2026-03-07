@@ -72,6 +72,20 @@ export default function Footer() {
                 <ArrowRight className="w-3 h-3" />
                 API Tester
               </Link>
+              <Link
+                href="/dashboard/image-generator"
+                className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
+              >
+                <ArrowRight className="w-3 h-3" />
+                Image Generator
+              </Link>
+              <Link
+                href="/dashboard/pdf-to-docx"
+                className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
+              >
+                <ArrowRight className="w-3 h-3" />
+                PDF to DOCX
+              </Link>
             </nav>
           </div>
 

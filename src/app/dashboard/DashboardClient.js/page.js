@@ -1,7 +1,5 @@
 
-"use client";
 import React from "react";
-import Head from "next/head";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -13,8 +11,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const tools = [
-  {
+const tools = [  {
     name: "AI Code Fixer",
     desc: "Paste your buggy code and let AI fix it instantly.",
     icon: <Code2 className="w-5 h-5 text-indigo-300" />,
@@ -49,25 +46,11 @@ const tools = [
     color: "from-sky-500/40 via-sky-500/10 to-transparent",
     link: "/dashboard/api-tester",
   },
-  {
-  name: "AI Image Generator",
-  desc: "Generate high-quality AI images from text prompts instantly.",
-  icon: <ImageIcon className="w-5 h-5 text-pink-300" />,
-  color: "from-pink-500/40 via-pink-500/10 to-transparent",
-  link: "/dashboard/image-generator",
-},
-  {
-  name: "PDF to DOCX Converter",
-  desc: "Convert PDF files to editable DOCX documents instantly.",
-  icon: <FileJson className="w-5 h-5 text-yellow-300" />,
-  color: "from-yellow-500/40 via-yellow-500/10 to-transparent",
-  link: "/dashboard/pdf-to-docx",
-},
 ];
 
-export default function Dashboard() {
+export default function DashboardClient() {
   return (
-    <>
+   <>
       <Head>
         <title>
           AI Tools Dashboard | Code Fixer, Summarizer, JSON Formatter, Image
