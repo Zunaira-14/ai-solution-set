@@ -1,24 +1,68 @@
 'use client';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function PdfToDocxPage() {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState([]); // [{file, status, progress}]
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [format, setFormat] = useState('docx'); // 'docx' | 'txt'
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewIndex, setPreviewIndex] = useState(0);
+
+  const [pageRange, setPageRange] = useState('');
+  const [ocr, setOcr] = useState(false);
+
+  const [converted, setConverted] = useState(null);
+
+  // Local history: [{name, format, time}]
+  const [history, setHistory] = useState([]);
+
+  // Load history from localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem('pdfToDocxHistory');
+      if (raw) setHistory(JSON.parse(raw));
+    } catch (e) {
+      console.error('History load fail', e);
+    }
+  }, []);
+
+  const saveHistory = (entry) => {
+    setHistory((prev) => {
+      const next = [entry, ...prev].slice(0, 5);
+      try {
+        localStorage.setItem('pdfToDocxHistory', JSON.stringify(next));
+      } catch (e) {
+        console.error('History save fail', e);
+      }
+      return next;
+    });
+  };
 
   const handleConvert = async () => {
     if (!files.length) {
-      setError('Pehle kam az kam ek PDF select karo 🙂');
+      setError('Please select at least one PDF 🙂');
       return;
     }
     setError('');
     setLoading(true);
+    setConverted(null);
+
+    // Mark all as converting
+    setFiles((prev) =>
+      prev.map((item) => ({
+        ...item,
+        status: 'converting',
+      }))
+    );
 
     try {
       const formData = new FormData();
-      files.forEach((f) => formData.append('files', f));
-      formData.append('format', format);
+      files.forEach((item) => formData.append('files', item.file));
+      formData.append('format', format); // 'docx' | 'txt'
+      if (pageRange.trim()) formData.append('pageRange', pageRange.trim());
+      formData.append('ocr', ocr ? 'true' : 'false');
 
       const res = await fetch('/api/pdf-to-docx', {
         method: 'POST',
@@ -34,39 +78,117 @@ export default function PdfToDocxPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
 
+      let fileName = 'converted-files.zip';
+
       if (files.length === 1) {
-        const baseName = files[0].name.replace(/\.pdf$/i, '');
-        a.download =
-          format === 'txt' ? `${baseName}.txt` : `${baseName}.docx`;
-      } else {
-        a.download = 'converted-files.zip';
+        const baseName = files[0].file.name.replace(/\.pdf$/i, '');
+        if (format === 'txt') {
+          fileName = `${baseName}.txt`;
+        } else {
+          fileName = `${baseName}.docx`;
+        }
       }
 
       a.href = url;
+      a.download = fileName;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(url);
+
+      setConverted({
+        name: fileName,
+        url,
+        format,
+        sizeLabel:
+          blob.size > 0
+            ? `${(blob.size / (1024 * 1024)).toFixed(2)} MB`
+            : undefined,
+      });
+
+      // Mark all as done
+      setFiles((prev) =>
+        prev.map((item) => ({
+          ...item,
+          status: 'done',
+          progress: 100,
+        }))
+      );
+
+      // Save history entry
+      saveHistory({
+        name: fileName,
+        format,
+        time: new Date().toISOString(),
+      });
     } catch (err) {
       console.error(err);
       setError(err.message || 'Kuch galat ho gaya.');
+
+      // Mark all failed
+      setFiles((prev) =>
+        prev.map((item) => ({
+          ...item,
+          status: item.status === 'converting' ? 'error' : item.status,
+        }))
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleFileChange = (e) => {
-    const selected = Array.from(e.target.files || []);
-    setFiles(selected);
+    const selectedFiles = Array.from(e.target.files || []);
+    const mapped = selectedFiles.map((f) => ({
+      file: f,
+      status: 'pending', // pending | converting | done | error
+      progress: 0,
+    }));
+    setFiles(mapped);
     setError('');
+    setConverted(null);
+
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (mapped.length > 0) {
+      setPreviewIndex(0);
+      setPreviewUrl(URL.createObjectURL(mapped[0].file));
+    } else {
+      setPreviewUrl(null);
+      setPreviewIndex(0);
+    }
   };
 
   const removeFile = (index) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFiles((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      if (next.length === 0) {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+        setPreviewIndex(0);
+      } else if (index === previewIndex) {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewIndex(0);
+        setPreviewUrl(URL.createObjectURL(next[0].file));
+      }
+      return next;
+    });
   };
 
   const totalSizeMB =
-    files.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024);
+    files.reduce((sum, it) => sum + it.file.size, 0) / (1024 * 1024);
+
+  const formatStatusLabel = (status) => {
+    if (status === 'pending') return 'Pending';
+    if (status === 'converting') return 'Converting...';
+    if (status === 'done') return 'Done';
+    if (status === 'error') return 'Failed';
+    return '';
+  };
+
+  const getOpenLabel = (fmt) => {
+    if (fmt === 'docx') return 'Word / Docs';
+    if (fmt === 'txt') return 'text editor';
+    return 'app';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center px-4 py-10">
@@ -75,7 +197,7 @@ export default function PdfToDocxPage() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur">
             <span className="text-xs font-medium tracking-wide text-emerald-300">
-              PDF TO WORD / TEXT CONVERTER
+              PDF TO WORD / TEXT
             </span>
             <span className="w-1 h-1 rounded-full bg-emerald-400" />
             <span className="text-xs text-slate-300">
@@ -90,13 +212,12 @@ export default function PdfToDocxPage() {
             converter online
           </h1>
           <p className="mt-3 text-sm md:text-base text-slate-300 max-w-2xl mx-auto">
-            Convert one or many PDFs into editable Word or plain-text files.
-            No signup, no watermark – fast PDF conversion for students,
-            freelancers and teams.
+            Convert one or many PDFs into editable documents. No signup, no
+            watermark – fast PDF conversion for students, freelancers and teams.
           </p>
         </div>
 
-        {/* Card */}
+        {/* MAIN CARD */}
         <div className="relative rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl shadow-emerald-500/15 overflow-hidden">
           <div className="pointer-events-none absolute inset-0 opacity-40">
             <div className="absolute -top-24 -left-24 h-52 w-52 rounded-full bg-emerald-500 blur-3xl" />
@@ -104,7 +225,7 @@ export default function PdfToDocxPage() {
           </div>
 
           <div className="relative p-6 md:p-8 space-y-6">
-            {/* Steps + format toggle row */}
+            {/* Steps + format toggle */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex flex-wrap gap-3 text-[11px] md:text-xs text-slate-300">
                 <span className="inline-flex items-center gap-2 rounded-full bg-black/30 px-3 py-1 border border-white/10">
@@ -117,7 +238,7 @@ export default function PdfToDocxPage() {
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
                     2
                   </span>
-                  Choose DOCX or TXT output
+                  Choose DOCX or TXT
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full bg-black/30 px-3 py-1 border border-white/10">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
@@ -127,11 +248,11 @@ export default function PdfToDocxPage() {
                 </span>
               </div>
 
-              {/* Format toggle */}
               <div className="inline-flex items-center gap-2 rounded-full bg-black/50 border border-white/10 px-2 py-1 text-[11px] text-slate-200">
                 <span className="px-2 text-[11px] text-slate-400">
                   Output format
                 </span>
+
                 <button
                   onClick={() => setFormat('docx')}
                   className={`px-3 py-1 rounded-full text-[11px] font-medium transition ${
@@ -142,6 +263,7 @@ export default function PdfToDocxPage() {
                 >
                   DOCX
                 </button>
+
                 <button
                   onClick={() => setFormat('txt')}
                   className={`px-3 py-1 rounded-full text-[11px] font-medium transition ${
@@ -157,7 +279,7 @@ export default function PdfToDocxPage() {
 
             {/* Upload + file list */}
             <div className="grid md:grid-cols-3 gap-5">
-              {/* Upload area (left) */}
+              {/* Upload */}
               <div className="md:col-span-2">
                 <label className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-500/60 bg-black/30 px-6 py-10 text-center transition hover:border-emerald-400 hover:bg-emerald-500/5">
                   <input
@@ -168,7 +290,6 @@ export default function PdfToDocxPage() {
                     onChange={handleFileChange}
                   />
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-300 group-hover:bg-emerald-500/25">
-                    {/* Upload icon */}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-7 w-7"
@@ -202,7 +323,7 @@ export default function PdfToDocxPage() {
                 </label>
               </div>
 
-              {/* File list (right) */}
+              {/* File list with status */}
               <div className="space-y-3 rounded-2xl bg-black/40 border border-white/10 px-3 py-3 text-xs text-slate-200">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-slate-100">
@@ -221,37 +342,153 @@ export default function PdfToDocxPage() {
                       No files added yet. Upload one or more PDFs to start.
                     </p>
                   )}
-                  {files.map((file, index) => (
+                  {files.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between gap-2 rounded-xl bg-white/5 px-2 py-1.5"
+                      className="flex flex-col gap-1 rounded-xl bg-white/5 px-2 py-1.5"
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-200 text-[10px]">
-                          {index + 1}
-                        </span>
-                        <div className="flex flex-col">
-                          <span className="max-w-[150px] truncate text-[11px] text-slate-100">
-                            {file.name}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex h-5 w-5 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-200 text-[10px]">
+                            {index + 1}
                           </span>
-                          <span className="text-[10px] text-slate-400">
-                            {(file.size / (1024 * 1024)).toFixed(2)} MB
+                          <div className="flex flex-col">
+                            <span className="max-w-[150px] truncate text-[11px] text-slate-100">
+                              {item.file.name}
+                            </span>
+                            <span className="text-[10px] text-slate-400">
+                              {(item.file.size / (1024 * 1024)).toFixed(2)} MB
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full ${
+                              item.status === 'done'
+                                ? 'bg-emerald-500/20 text-emerald-200'
+                                : item.status === 'converting'
+                                ? 'bg-cyan-500/20 text-cyan-200'
+                                : item.status === 'error'
+                                ? 'bg-red-500/20 text-red-200'
+                                : 'bg-slate-500/20 text-slate-200'
+                            }`}
+                          >
+                            {formatStatusLabel(item.status)}
                           </span>
+                          <button
+                            onClick={() => {
+                              if (previewUrl) URL.revokeObjectURL(previewUrl);
+                              setPreviewIndex(index);
+                              setPreviewUrl(
+                                URL.createObjectURL(item.file)
+                              );
+                            }}
+                            className="text-[10px] text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline transition"
+                          >
+                            Preview
+                          </button>
+                          <button
+                            onClick={() => removeFile(index)}
+                            className="text-[10px] text-slate-400 hover:text-red-300 transition"
+                          >
+                            Remove
+                          </button>
                         </div>
                       </div>
-                      <button
-                        onClick={() => removeFile(index)}
-                        className="text-[10px] text-slate-400 hover:text-red-300 transition"
-                      >
-                        Remove
-                      </button>
+
+                      {/* mini progress bar (placeholder) */}
+                      <div className="h-1 rounded-full bg-slate-800 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-300"
+                          style={{
+                            width:
+                              item.status === 'done'
+                                ? '100%'
+                                : item.status === 'converting'
+                                ? '70%'
+                                : item.status === 'error'
+                                ? '100%'
+                                : '10%',
+                            opacity:
+                              item.status === 'pending' ? 0.4 : 1,
+                          }}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Error / helper text */}
+            {/* PDF Preview */}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/40 px-4 py-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-medium text-slate-100">
+                  Preview{' '}
+                  {files.length
+                    ? `(${files[previewIndex]?.file?.name || ''})`
+                    : ''}
+                </p>
+                <span className="text-[10px] text-slate-400">
+                  Quick visual preview · conversion quality may differ slightly
+                </span>
+              </div>
+
+              {previewUrl ? (
+                <div className="h-72 rounded-xl border border-white/10 bg-black/60 overflow-hidden">
+                  <iframe
+                    src={previewUrl}
+                    className="w-full h-full"
+                    title="PDF preview"
+                  />
+                </div>
+              ) : (
+                <div className="h-32 rounded-xl border border-dashed border-slate-600 flex items-center justify-center text-[11px] text-slate-500">
+                  Select a PDF and click “Preview” to see it here.
+                </div>
+              )}
+            </div>
+
+            {/* Advanced options */}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-[11px] text-slate-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="font-medium text-slate-100">
+                  Advanced options
+                </p>
+                <span className="text-[10px] text-slate-500">
+                  Optional · leave as default for most files
+                </span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block mb-1 text-[10px] uppercase tracking-wide text-slate-400">
+                    Page range
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="All pages (or 1-3,5)"
+                    className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2 text-[11px] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                    value={pageRange}
+                    onChange={(e) => setPageRange(e.target.value)}
+                  />
+                </div>
+
+                <label className="mt-4 md:mt-6 inline-flex items-center gap-2 text-[11px] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="h-3 w-3 rounded border-slate-500 bg-black"
+                    checked={ocr}
+                    onChange={(e) => setOcr(e.target.checked)}
+                  />
+                  <span className="text-slate-300">
+                    My PDFs are scanned images (enable OCR for better text)
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Error / helper */}
             {error ? (
               <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs md:text-sm text-red-100">
                 <div className="flex items-center gap-2">
@@ -272,14 +509,13 @@ export default function PdfToDocxPage() {
               </div>
             ) : (
               <p className="text-[11px] md:text-xs text-slate-400">
-                This PDF converter first extracts clean text, then generates your{' '}
-                {format.toUpperCase()} files. Complex layouts may change, but your
-                content remains fully editable in Word, Google Docs or any text
-                editor.
+                This PDF converter turns your PDFs into clean{' '}
+                {format.toUpperCase()} output. Layout may change slightly, but
+                your content stays easy to reuse and share.
               </p>
             )}
 
-            {/* CTA */}
+            {/* CTA + meta */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-2">
               <button
                 onClick={handleConvert}
@@ -324,140 +560,54 @@ export default function PdfToDocxPage() {
           </div>
         </div>
 
-        {/* WHY section */}
-        <section className="mt-12 rounded-3xl border border-white/10 bg-black/30 px-5 py-6 md:px-7 md:py-7 text-slate-200 space-y-5">
-          <div className="flex items-start gap-3">
-            <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-300">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M9.09 9a3 3 0 015.82 1c0 2-2.5 2.5-2.5 4" />
-                <path d="M12 17h.01" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-xl md:text-2xl font-semibold text-white">
-                Why convert PDF to Word or text?
-              </h2>
-              <p className="mt-2 text-sm md:text-base text-slate-300">
-                PDFs are great for sharing but difficult to edit. Converting to
-                Word (DOCX) or plain text lets you quickly update content,
-                collaborate with others, and reuse information without retyping.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4 text-sm md:text-base">
-            <div className="group flex h-full cursor-pointer items-start gap-3 rounded-2xl border border-white/5 bg-white/5 px-4 py-4 transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
-              <div className="mt-1 h-7 w-7 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                >
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.12 2.12 0 013 3L8 18l-4 1 1-4Z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-semibold text-white">
-                  Edit anything instantly
-                </p>
-                <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                  Fix typos, update prices, and adjust paragraphs in seconds
-                  without touching the original PDF design.
-                </p>
-              </div>
-            </div>
-
-            <div className="group flex h-full cursor-pointer items-start gap-3 rounded-2xl border border-white/5 bg-white/5 px-4 py-4 transition hover:border-cyan-400/60 hover:bg-cyan-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20">
-              <div className="mt-1 h-7 w-7 rounded-full bg-cyan-500/15 flex items-center justify-center text-cyan-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                >
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 7v5l3 2" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-semibold text-white">
-                  Save hours of manual work
-                </p>
-                <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                  Skip copy‑pasting from PDFs. Export once, then edit in Word,
-                  Google Docs or your favorite text editor.
-                </p>
-              </div>
-            </div>
-
-            <div className="group flex h-full cursor-pointer items-start gap-3 rounded-2xl border border-white/5 bg-white/5 px-4 py-4 transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
-              <div className="mt-1 h-7 w-7 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                >
-                  <path d="M18 21a8 8 0 00-12 0" />
-                  <circle cx="12" cy="8" r="3" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-semibold text-white">
-                  Collaborate without friction
-                </p>
-                <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                  Share DOCX with your team so everyone can comment, suggest
-                  edits and track changes like any normal document.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Benefits + use cases + features */}
-        <section className="mt-10 space-y-8 text-slate-200">
-          {/* Benefits row */}
-          <div className="grid md:grid-cols-3 gap-5">
-            <div className="group relative flex h-full cursor-pointer flex-col rounded-2xl border border-white/10 bg-white/5 px-4 py-5 overflow-hidden transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
-              <div className="absolute -top-6 -right-6 h-16 w-16 rounded-full bg-emerald-500/25 blur-xl" />
-              <div className="relative flex items-start gap-3">
-                <span className="mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 text-base">
-                  ✓
-                </span>
+        {/* Converted result */}
+        {converted && (
+          <section className="mt-8 rounded-3xl border border-emerald-500/40 bg-emerald-500/10 px-5 py-4 text-slate-100">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/30 text-emerald-950">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  >
+                    <path d="M5 12l5 5L20 7" />
+                  </svg>
+                </div>
                 <div>
-                  <h2 className="text-base md:text-lg font-semibold text-white">
-                    Clean, editable output
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                    Get DOCX or TXT files that open perfectly in Word, Google
-                    Docs and any text editor without strange characters or
-                    broken lines.
+                  <p className="text-sm font-semibold">
+                    Conversion complete
                   </p>
+                  <p className="text-xs text-emerald-100/80">
+                    Your {converted.format.toUpperCase()} file is ready to
+                    use. You can re-download it anytime while this tab is
+                    open.
+                  </p>
+                  <div className="mt-2 inline-flex items-center gap-3 rounded-2xl bg-black/40 px-3 py-2 text-[11px]">
+                    <span className="max-w-[180px] truncate font-medium">
+                      {converted.name}
+                    </span>
+                    {converted.sizeLabel && (
+                      <span className="text-emerald-200/80">
+                        {converted.sizeLabel}
+                      </span>
+                    )}
+                    <span className="rounded-full bg-emerald-500/25 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                      {converted.format.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="group relative flex h-full cursor-pointer flex-col rounded-2xl border border-white/10 bg-white/5 px-4 py-5 overflow-hidden transition hover:border-cyan-400/60 hover:bg-cyan-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20">
-              <div className="absolute -bottom-6 -left-6 h-16 w-16 rounded-full bg-cyan-500/25 blur-xl" />
-              <div className="relative flex items-start gap-3">
-                <span className="mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-300">
+              <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                <a
+                  href={converted.url}
+                  download={converted.name}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-emerald-400 px-4 py-2 text-slate-950 font-semibold shadow-md shadow-emerald-500/40 hover:brightness-110 transition"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4"
@@ -466,97 +616,119 @@ export default function PdfToDocxPage() {
                     stroke="currentColor"
                     strokeWidth="1.8"
                   >
-                    <path d="M12 3 5 6v6c0 4 2.5 7 7 8 4.5-1 7-4 7-8V6z" />
-                    <path d="M9 12l2 2 4-4" />
+                    <path d="M4 17v2h16v-2" />
+                    <path d="M12 3v12" />
+                    <path d="M8 11l4 4 4-4" />
                   </svg>
-                </span>
-                <div>
-                  <h2 className="text-base md:text-lg font-semibold text-white">
-                    Secure by default
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                    Your files are processed on your own server, then downloaded
-                    directly to your device — no long‑term storage or third‑party
-                    access.
-                  </p>
-                </div>
-              </div>
-            </div>
+                  Download again
+                </a>
 
-            <div className="group relative flex h-full cursor-pointer flex-col rounded-2xl border border-white/10 bg-white/5 px-4 py-5 overflow-hidden transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
-              <div className="absolute -top-8 right-0 h-16 w-16 rounded-full bg-emerald-400/20 blur-xl" />
-              <div className="relative flex items-start gap-3">
-                <span className="mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                  >
-                    <path d="M13 2L3 14h7l-1 8 10-12h-7z" />
-                  </svg>
-                </span>
-                <div>
-                  <h2 className="text-base md:text-lg font-semibold text-white">
-                    Multi‑file & ZIP support
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                    Upload multiple PDFs at once and download a single ZIP with
-                    all your converted DOCX or TXT files ready to use.
-                  </p>
-                </div>
+                <a
+                  href={converted.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-emerald-300/60 bg-black/40 px-4 py-2 text-emerald-100 hover:bg-emerald-500/10 transition"
+                >
+                  <span>
+                    Open in {getOpenLabel(converted.format)}
+                  </span>
+                </a>
               </div>
             </div>
+          </section>
+        )}
+
+        {/* History section */}
+        {history.length > 0 && (
+          <section className="mt-6 rounded-3xl border border-white/10 bg-black/40 px-5 py-4 text-slate-200">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold">Recent conversions</p>
+              <span className="text-[10px] text-slate-500">
+                Only stored in your browser
+              </span>
+            </div>
+            <div className="space-y-2 text-[11px]">
+              {history.map((h, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-200 text-[10px]">
+                      {idx + 1}
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="max-w-[180px] truncate text-slate-100">
+                        {h.name}
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        {new Date(h.time).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-emerald-500/25 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                    {h.format.toUpperCase()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* More tools (coming soon) */}
+        <section className="mt-8 grid md:grid-cols-3 gap-4 text-slate-200">
+          <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-black/30 px-4 py-4 transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-lg">
+                📎
+              </span>
+              <p className="font-semibold text-base text-white">
+                Merge PDFs
+              </p>
+              <span className="ml-auto text-[10px] rounded-full bg-emerald-500/20 px-2 py-0.5 text-emerald-200">
+                Coming soon
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+              Combine multiple PDFs into a single clean document for reports,
+              proposals and project files.
+            </p>
           </div>
 
-          {/* Use cases row */}
-          <div className="grid md:grid-cols-3 gap-5 text-slate-200">
-            <div className="group flex h-full cursor-pointer flex-col rounded-2xl border border-white/10 bg-black/30 px-4 py-4 transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-lg">
-                  🎓
-                </span>
-                <p className="font-semibold text-base text-white">
-                  Students & teachers
-                </p>
-              </div>
-              <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                Convert research papers, e‑books and notes to editable formats
-                for assignments, summaries, handouts and study guides.
+          <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-black/30 px-4 py-4 transition hover:border-cyan-400/60 hover:bg-cyan-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/15 text-lg">
+                🪄
+              </span>
+              <p className="font-semibold text-base text-white">
+                Compress PDF
               </p>
+              <span className="ml-auto text-[10px] rounded-full bg-cyan-500/20 px-2 py-0.5 text-cyan-200">
+                Planned
+              </span>
             </div>
+            <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+              Reduce PDF file size for faster sharing and easier email
+              attachments without losing readability.
+            </p>
+          </div>
 
-            <div className="group flex h-full cursor-pointer flex-col rounded-2xl border border-white/10 bg-black/30 px-4 py-4 transition hover:border-cyan-400/60 hover:bg-cyan-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/15 text-lg">
-                  💼
-                </span>
-                <p className="font-semibold text-base text-white">
-                  Freelancers & offices
-                </p>
-              </div>
-              <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                Turn invoices, contracts and proposals from fixed PDFs into
-                flexible Word files so you can update data in minutes.
+          <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-black/30 px-4 py-4 transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-lg">
+                📊
+              </span>
+              <p className="font-semibold text-base text-white">
+                PDF to Excel / PPT
               </p>
+              <span className="ml-auto text-[10px] rounded-full bg-emerald-500/20 px-2 py-0.5 text-emerald-200">
+                Roadmap
+              </span>
             </div>
-
-            <div className="group flex h-full cursor-pointer flex-col rounded-2xl border border-white/10 bg-black/30 px-4 py-4 transition hover:border-emerald-400/60 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-lg">
-                  🌍
-                </span>
-                <p className="font-semibold text-base text-white">
-                  Content & SEO teams
-                </p>
-              </div>
-              <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                Extract text from PDFs to reuse in blog posts, landing pages and
-                multilingual content without formatting issues.
-              </p>
-            </div>
+            <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+              Export tables and slides from PDFs directly into Excel sheets or
+              presentation decks.
+            </p>
           </div>
         </section>
       </div>

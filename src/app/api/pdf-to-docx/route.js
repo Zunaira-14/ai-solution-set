@@ -1,72 +1,3 @@
-
-// import { NextResponse } from 'next/server';
-// import pdf_parse from 'pdf-parse-new';
-// import { Document, Packer, Paragraph } from 'docx';
-
-// export const runtime = 'nodejs';
-
-// export async function POST(req) {
-//   try {
-//     const formData = await req.formData();
-//     const file = formData.get('file');
-
-//     if (!file) {
-//       return NextResponse.json(
-//         { error: 'PDF file required hai.' },
-//         { status: 400 }
-//       );
-//     }
-
-//     const arrayBuffer = await file.arrayBuffer();
-//     const buffer = Buffer.from(arrayBuffer);
-
-//     // pdf-parse-new se text nikaalo
-//     const data = await pdf_parse(buffer); // data.text[web:56]
-//     const text = data.text || '';
-
-//     if (!text.trim()) {
-//       return NextResponse.json(
-//         { error: 'PDF se text extract nahi ho saka.' },
-//         { status: 500 }
-//       );
-//     }
-
-//     const paragraphs = text
-//       .split('\n')
-//       .filter((line) => line.trim().length > 0)
-//       .map(
-//         (line) =>
-//           new Paragraph({
-//             text: line,
-//           })
-//       );
-
-//     const doc = new Document({
-//       sections: [
-//         {
-//           children: paragraphs,
-//         },
-//       ],
-//     });
-
-//     const docBuffer = await Packer.toBuffer(doc);
-
-//     return new NextResponse(docBuffer, {
-//       status: 200,
-//       headers: {
-//         'Content-Type':
-//           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-//         'Content-Disposition': 'attachment; filename="converted.docx"',
-//       },
-//     });
-//   } catch (err) {
-//     console.error('PDF->DOCX error:', err);
-//     return NextResponse.json(
-//       { error: 'Convert nahi ho saka. Dobara try karein.' },
-//       { status: 500 }
-//     );
-//   }
-// }
 import { NextResponse } from 'next/server';
 import pdf_parse from 'pdf-parse-new';
 import { Document, Packer, Paragraph } from 'docx';
@@ -75,7 +6,7 @@ import JSZip from 'jszip';
 export const runtime = 'nodejs';
 
 async function pdfBufferToText(buffer) {
-  const data = await pdf_parse(buffer); // data.text[web:56]
+  const data = await pdf_parse(buffer);
   return data.text || '';
 }
 
@@ -89,7 +20,9 @@ async function textToDocxBuffer(text) {
   const doc = new Document({
     sections: [
       {
-        children: paragraphs.length ? paragraphs : [new Paragraph({ text: '' })],
+        children: paragraphs.length
+          ? paragraphs
+          : [new Paragraph({ text: '' })],
       },
     ],
   });
@@ -111,7 +44,7 @@ export async function POST(req) {
       );
     }
 
-    // Single file + single output
+    // SINGLE FILE
     if (files.length === 1) {
       const file = files[0];
       const arrayBuffer = await file.arrayBuffer();
@@ -125,57 +58,52 @@ export async function POST(req) {
         );
       }
 
+      const baseName = file.name.replace(/\.pdf$/i, '');
+
       if (format === 'txt') {
         const txtBuffer = Buffer.from(text, 'utf-8');
         return new NextResponse(txtBuffer, {
           status: 200,
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
-            'Content-Disposition': `attachment; filename="${file.name.replace(
-              /\.pdf$/i,
-              ''
-            )}.txt"`,
+            'Content-Disposition': `attachment; filename="${baseName}.txt"`,
           },
         });
       }
 
-      // DOCX
       const docBuffer = await textToDocxBuffer(text);
       return new NextResponse(docBuffer, {
         status: 200,
         headers: {
           'Content-Type':
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'Content-Disposition': `attachment; filename="${file.name.replace(
-            /\.pdf$/i,
-            ''
-          )}.docx"`,
+          'Content-Disposition': `attachment; filename="${baseName}.docx"`,
         },
       });
     }
 
-    // Multiple files => ZIP
-    const zip = new JSZip(); // [web:79][web:81]
+    // MULTIPLE FILES => ZIP
+    const zip = new JSZip();
 
     for (const file of files) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       const text = await pdfBufferToText(buffer);
+      const baseName = file.name.replace(/\.pdf$/i, '');
 
-      let outName = file.name.replace(/\.pdf$/i, '');
       if (!text.trim()) {
         zip.file(
-          `${outName}-error.txt`,
+          `${baseName}-error.txt`,
           'Could not extract text from this PDF.'
         );
         continue;
       }
 
       if (format === 'txt') {
-        zip.file(`${outName}.txt`, text);
+        zip.file(`${baseName}.txt`, text);
       } else {
         const docBuffer = await textToDocxBuffer(text);
-        zip.file(`${outName}.docx`, docBuffer);
+        zip.file(`${baseName}.docx`, docBuffer);
       }
     }
 
@@ -183,7 +111,7 @@ export async function POST(req) {
       type: 'nodebuffer',
       compression: 'DEFLATE',
       compressionOptions: { level: 6 },
-    }); // [web:79][web:80]
+    });
 
     return new NextResponse(zipContent, {
       status: 200,

@@ -123,7 +123,7 @@ export default function Home() {
                 <div className="col-span-1 sm:col-span-2 p-4 rounded-2xl bg-black/70 border border-indigo-500/40 flex flex-col gap-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-indigo-200">
-                      Included in DevPulse
+                      Included in Dev Cortex AI
                     </span>
                     <span className="text-[10px] text-gray-400">
                       Code · Text · Media · APIs

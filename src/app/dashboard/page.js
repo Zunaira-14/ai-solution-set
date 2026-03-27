@@ -11,6 +11,7 @@ import {
   Code2,
   Zap,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 
 const tools = [
@@ -49,19 +50,26 @@ const tools = [
     color: "from-sky-500/40 via-sky-500/10 to-transparent",
     link: "/dashboard/api-tester",
   },
-  {
-  name: "AI Image Generator",
-  desc: "Generate high-quality AI images from text prompts instantly.",
-  icon: <ImageIcon className="w-5 h-5 text-pink-300" />,
-  color: "from-pink-500/40 via-pink-500/10 to-transparent",
-  link: "/dashboard/image-generator",
-},
+//   {
+//   name: "AI Image Generator",
+//   desc: "Generate high-quality AI images from text prompts instantly.",
+//   icon: <ImageIcon className="w-5 h-5 text-pink-300" />,
+//   color: "from-pink-500/40 via-pink-500/10 to-transparent",
+//   link: "/dashboard/image-generator",
+// },
   {
   name: "PDF to DOCX Converter",
   desc: "Convert PDF files to editable DOCX documents instantly.",
   icon: <FileJson className="w-5 h-5 text-yellow-300" />,
   color: "from-yellow-500/40 via-yellow-500/10 to-transparent",
   link: "/dashboard/pdf-to-docx",
+},
+  {
+  name: "AI Content Humanizer",
+  desc: "Make AI text sound natural and human in one click.",
+  icon: <Sparkles className="w-5 h-5 text-yellow-300" />,
+  color: "from-yellow-500/40 via-yellow-500/10 to-transparent",
+  link: "/dashboard/humanizeContex",
 },
 ];
 
@@ -92,7 +100,7 @@ export default function Dashboard() {
           <header className="mb-10 space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/40 bg-indigo-500/10 px-3 py-1 text-[11px] font-medium text-indigo-200">
               <Zap className="w-3.5 h-3.5 text-indigo-300" />
-              DevPulse · AI Tools Dashboard
+              Dev Cortex AI · AI Tools Dashboard
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight flex items-center gap-2">
               AI Intelligence Hub
@@ -157,7 +165,6 @@ export default function Dashboard() {
               </motion.div>
             ))}
           </section>
-
           {/* SEO Content */}
           <section className="mt-14 max-w-3xl text-gray-500 text-xs sm:text-sm space-y-2.5">
             <h2 className="font-semibold text-gray-200 text-sm sm:text-base">

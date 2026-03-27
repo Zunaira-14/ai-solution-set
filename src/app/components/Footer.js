@@ -11,16 +11,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand + SEO text */}
           <div className="md:col-span-2 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-400/60 shadow-[0_0_18px_rgba(79,70,229,0.7)]">
-                <Cpu className="text-indigo-300 w-4 h-4" />
+            <Link href="/" className="flex items-center ">
+              <div className=" p-2 rounded-lg">
+                <img src="/favicons.ico" alt="DevCortex Logo" className="w-6 h-6" />
               </div>
-              <span className="text-lg font-semibold text-white tracking-tight">
-                DevPulse<span className="text-indigo-400">.ai</span>
+              <span className="text-2xl font-bold text-white tracking-tight">
+                DevCortex<span className="text-indigo-500">.ai</span>
               </span>
-            </div>
+            </Link>
             <p className="text-xs sm:text-sm text-gray-400 max-w-md">
-              DevPulse.ai is a small **AI developer toolkit** that brings
+              DevCortex.ai is a small **AI developer toolkit** that brings
               together code fixing, text summarization, JSON formatting, image
               optimization, and API testing — all inside a fast, browser‑based
               dashboard.
@@ -138,14 +138,7 @@ export default function Footer() {
     >
       <Globe size={18} />
     </a>
-    <a
-      href="https://www.codeexpertx.com/"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-gray-500 hover:text-white transition-colors"
-    >
-      <Globe size={18} />
-    </a>
+  
   </div>
 </div>
 
