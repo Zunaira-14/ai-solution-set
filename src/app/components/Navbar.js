@@ -12,7 +12,7 @@ const tools = [
   { name: "Image Optimizer", href: "/dashboard/image-tool" },
   { name: "API Tester", href: "/dashboard/api-tester" },
   // { name: "Image Generator", href: "/dashboard/image-generator" },
-  { name: "PDF to DOCX", href: "/dashboard/pdf-to-docx" },
+  // { name: "PDF to DOCX", href: "/dashboard/pdf-to-docx" },
   { name: "Humanizer Content", href: "/dashboard/humanizeContex" },
 ];
 

@@ -57,13 +57,13 @@ const tools = [
 //   color: "from-pink-500/40 via-pink-500/10 to-transparent",
 //   link: "/dashboard/image-generator",
 // },
-  {
-  name: "PDF to DOCX Converter",
-  desc: "Convert PDF files to editable DOCX documents instantly.",
-  icon: <FileJson className="w-5 h-5 text-yellow-300" />,
-  color: "from-yellow-500/40 via-yellow-500/10 to-transparent",
-  link: "/dashboard/pdf-to-docx",
-},
+//   {
+//   name: "PDF to DOCX Converter",
+//   desc: "Convert PDF files to editable DOCX documents instantly.",
+//   icon: <FileJson className="w-5 h-5 text-yellow-300" />,
+//   color: "from-yellow-500/40 via-yellow-500/10 to-transparent",
+//   link: "/dashboard/pdf-to-docx",
+// },
   {
   name: "AI Content Humanizer",
   desc: "Make AI text sound natural and human in one click.",
