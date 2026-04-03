@@ -64,7 +64,7 @@ import Script from "next/script";
 
 export const metadata = {
   title: "DevCortex.ai",
-  description: "Developer behind DevCortex.ai, a modern AI tools platform for engineers and creators, featuring AI Code Fixer, Smart Summarizer, JSON Formatter, Image Optimizer, API Tester, and AI Content Humanizer. Skilled in building full‑stack JavaScript applications, integrating AI APIs, and optimizing web performance, UX, and SEO for production‑ready products.",
+  description: "Developer behind DevCortex.ai, a modern AI tools platform for engineers and creators, featuring AI Code Fixer, Smart Summarizer, JSON Formatter, Image Optimizer, API Tester, and AI Content Humanizer. Skilled in building full‑stack JavaScript applications, integrating AI APIs, and optimizing performance, UX, and SEO for scalable, production‑ready web",
       canonical: "https://www.devcortexai.me/",
   icons: {
     icon: "/favicon.ico",
