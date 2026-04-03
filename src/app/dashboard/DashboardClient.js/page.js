@@ -13,6 +13,8 @@
 //   Sparkles,
 // } from "lucide-react";
 
+import DashboardClient from "../page";
+
 // const tools = [
 //   {
 //     name: "AI Code Fixer",
@@ -198,3 +200,10 @@
 //   );
 // }
 
+export default function DashboardClient() {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-slate-200">
+      Image generator is temporarily disabled.
+    </div>
+  );
+}
