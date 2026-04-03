@@ -1,40 +1,66 @@
+// // // import "./globals.css";
+// // // import Navbar from "./components/Navbar";
+// // // export default function RootLayout({ children }) {
+// // //   return (
+// // //     <html lang="en">
+// // //       <body className="bg-black text-white">
+// // //         <Navbar />
+// // //         <main className="mt-20"> {/* Navbar fixed hai isliye thora margin diya */}
+// // //           {children}
+// // //         </main>
+// // //       </body>
+// // //     </html>
+// // //   );
+// // // }
+// // // 
 // // import "./globals.css";
-// // import Navbar from "./components/Navbar";
-// // export default function RootLayout({ children }) {
+// // import Navbar from "@/app/components/Navbar";
+// // import connectDB from "@/app/lib/mongodb";
+// // import Footer from "./components/Footer"; 
+// // // import StatsSection from "./StatsSection.js/page";
+
+// // export default async function RootLayout({ children }) {
+// //   await connectDB(); // try-catch ki zarurat nahi agar env sahi ho
+
 // //   return (
 // //     <html lang="en">
-// //       <body className="bg-black text-white">
+// //       <body className="bg-black text-white font-sans antialiased">
 // //         <Navbar />
-// //         <main className="mt-20"> {/* Navbar fixed hai isliye thora margin diya */}
+// //         <main className="mt-20">
 // //           {children}
 // //         </main>
+// //         {/* <StatsSection/> */}
+// //         <Footer/>
 // //       </body>
 // //     </html>
 // //   );
 // // }
-// // 
-// import "./globals.css";
-// import Navbar from "@/app/components/Navbar";
-// import connectDB from "@/app/lib/mongodb";
-// import Footer from "./components/Footer"; 
-// // import StatsSection from "./StatsSection.js/page";
+// // import "./globals.css";
+// // import Navbar from "@/app/components/Navbar";
+// // import connectDB from "@/app/lib/mongodb";
+// // import Footer from "./components/Footer";
 
-// export default async function RootLayout({ children }) {
-//   await connectDB(); // try-catch ki zarurat nahi agar env sahi ho
+// // export const metadata = {
+// //   title: "DevCortex.ai",
+// //   description: "AI tools suite for developers",
+// //   icons: {
+// //     icon: "/favicon.ico",
+// //   },
+// // };
 
-//   return (
-//     <html lang="en">
-//       <body className="bg-black text-white font-sans antialiased">
-//         <Navbar />
-//         <main className="mt-20">
-//           {children}
-//         </main>
-//         {/* <StatsSection/> */}
-//         <Footer/>
-//       </body>
-//     </html>
-//   );
-// }
+// // export default async function RootLayout({ children }) {
+// //   await connectDB();
+
+// //   return (
+// //     <html lang="en">
+// //       <body className="bg-black text-white font-sans antialiased">
+// //         <Navbar />
+// //         <main className="mt-20">{children}</main>
+// //         <Footer />
+// //       </body>
+// //     </html>
+// //   );
+// // }
 // import "./globals.css";
 // import Navbar from "@/app/components/Navbar";
 // import connectDB from "@/app/lib/mongodb";
@@ -45,14 +71,40 @@
 //   description: "AI tools suite for developers",
 //   icons: {
 //     icon: "/favicon.ico",
+//     icon:"/app/favicon-for-app",
+//     icon:"/favicon.icos",
+
 //   },
+//   // verification: {
+//   //   "google-site-verification": "google54af04aef387e2db.html", 
+//   // },
+// }
+
 // };
-
-// export default async function RootLayout({ children }) {
-//   await connectDB();
-
-//   return (
-//     <html lang="en">
+// <script
+//   type="application/ld+json"
+//   dangerouslySetInnerHTML={{
+//     __html: JSON.stringify({
+//       "@context": "http://www.sitemaps.org/schemas/sitemap/0.9",
+//       "@type": "WebSite",
+//       "name": "DevCortex.ai",
+//       "url": "https://www.devcortexai.me/"
+//     })
+//   }}
+//   />
+  
+  
+//   export default async function RootLayout({ children }) {
+//     await connectDB();
+    
+//     return (
+//       <html lang="en">
+//       export const metadata = {
+//       verification: {
+//         google: 'google54af04aef387e2db.html',
+//       },
+//     }
+//     <meta name="apple-mobile-web-app-title" content="devcortexai" />
 //       <body className="bg-black text-white font-sans antialiased">
 //         <Navbar />
 //         <main className="mt-20">{children}</main>
@@ -71,33 +123,38 @@ export const metadata = {
   description: "AI tools suite for developers",
   icons: {
     icon: "/favicon.ico",
-    icon:"/app/favicon-for-app",
-    icon:"/favicon.icos",
-
+    apple: "/app/favicon-for-app", // Assuming this is an apple-touch-icon
   },
   verification: {
-    "google-site-verification": "google54af04aef387e2db.html", 
+    google: "google54af04aef387e2db.html",
+  },
+  other: {
+    "apple-mobile-web-app-title": "devcortexai",
   },
 };
-<script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "http://www.sitemaps.org/schemas/sitemap/0.9",
-      "@type": "WebSite",
-      "name": "DevCortex.ai",
-      "url": "https://www.devcortexai.me/"
-    })
-  }}
-/>
-
 
 export default async function RootLayout({ children }) {
-  await connectDB();
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error("Database connection failed:", error);
+  }
 
   return (
     <html lang="en">
-<meta name="apple-mobile-web-app-title" content="devcortexai" />
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "DevCortex.ai",
+              url: "https://www.devcortexai.me/",
+            }),
+          }}
+        />
+      </head>
       <body className="bg-black text-white font-sans antialiased">
         <Navbar />
         <main className="mt-20">{children}</main>
