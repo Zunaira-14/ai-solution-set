@@ -6,6 +6,7 @@ export default function robots() {
         allow: "/",
       },
     ],
-    sitemap: "https://yourwebsite.com/sitemap.xml",
+    sitemap: "https://devcortexai.me/sitemap.xml",
   };
+
 }
