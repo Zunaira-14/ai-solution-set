@@ -249,3 +249,10 @@
 //     </div>
 //   );
 // }
+export default function ImageGeneratorPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-slate-200">
+      Image generator is temporarily disabled.
+    </div>
+  );
+}
