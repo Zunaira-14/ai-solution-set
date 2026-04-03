@@ -164,10 +164,48 @@
 //     </html>
 //   );
 // }
+// import "./globals.css";
+// import Navbar from "@/app/components/Navbar";
+// import connectDB from "@/app/lib/mongodb";
+// import Footer from "./components/Footer";
+
+// export const metadata = {
+//   title: "DevCortex.ai",
+//   description: "AI tools suite for developers",
+//   icons: {
+//     icon: "/favicon.ico",
+//     apple: "/app/favicon-for-app",
+//   },
+//   verification: {
+//     google: "google54af04aef387e2db",
+//   },
+//   other: {
+//     "apple-mobile-web-app-title": "devcortexai",
+//   },
+// };
+
+// export default async function RootLayout({ children }) {
+//   try {
+//     await connectDB();
+//   } catch (error) {
+//     console.error("Database connection failed:", error);
+//   }
+
+//   return (
+//     <html lang="en">
+//       <body className="bg-black text-white font-sans antialiased">
+//         <Navbar />
+//         <main className="mt-20">{children}</main>
+//         <Footer />
+//       </body>
+//     </html>
+//   );
+// }
 import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import connectDB from "@/app/lib/mongodb";
 import Footer from "./components/Footer";
+import Script from "next/script";
 
 export const metadata = {
   title: "DevCortex.ai",
@@ -197,6 +235,24 @@ export default async function RootLayout({ children }) {
         <Navbar />
         <main className="mt-20">{children}</main>
         <Footer />
+
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-QQJ3YC555K"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-QQJ3YC555K');
+            `,
+          }}
+        />
       </body>
     </html>
   );
