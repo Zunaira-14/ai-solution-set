@@ -22,6 +22,7 @@
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.1",
     "next": "16.1.6",
+    "next-sitemap": "^4.2.3",
     "openai": "^6.29.0",
     "pdf-parse-new": "^2.0.0",
     "pdf-poppler": "^0.2.3",

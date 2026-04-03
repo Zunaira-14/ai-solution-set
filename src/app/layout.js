@@ -126,8 +126,9 @@ export const metadata = {
     apple: "/app/favicon-for-app", // Assuming this is an apple-touch-icon
   },
   verification: {
-    google: "google54af04aef387e2db.html",
+    google: "google54af04aef387e2db",
   },
+  
   other: {
     "apple-mobile-web-app-title": "devcortexai",
   },
