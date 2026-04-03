@@ -113,6 +113,57 @@
 //     </html>
 //   );
 // }
+// import "./globals.css";
+// import Navbar from "@/app/components/Navbar";
+// import connectDB from "@/app/lib/mongodb";
+// import Footer from "./components/Footer";
+
+// export const metadata = {
+//   title: "DevCortex.ai",
+//   description: "AI tools suite for developers",
+//   icons: {
+//     icon: "/favicon.ico",
+//     apple: "/app/favicon-for-app", // Assuming this is an apple-touch-icon
+//   },
+//   verification: {
+//     google:"google54af04aef387e2db",
+//   },
+  
+//   other: {
+//     "apple-mobile-web-app-title": "devcortexai",
+//   },
+// };
+
+// export default async function RootLayout({ children }) {
+//   try {
+//     await connectDB();
+//   } catch (error) {
+//     console.error("Database connection failed:", error);
+//   }
+
+//   return (
+//     <html lang="en">
+//       <head>
+//         <script
+//           type="application/ld+json"
+//           dangerouslySetInnerHTML={{
+//             __html: JSON.stringify({
+//               "@context": "https://schema.org",
+//               "@type": "WebSite",
+//               name: "DevCortex.ai",
+//               url: "https://www.devcortexai.me/",
+//             }),
+//           }}
+//         />
+//       </head>
+//       <body className="bg-black text-white font-sans antialiased">
+//         <Navbar />
+//         <main className="mt-20">{children}</main>
+//         <Footer />
+//       </body>
+//     </html>
+//   );
+// }
 import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import connectDB from "@/app/lib/mongodb";
@@ -123,12 +174,11 @@ export const metadata = {
   description: "AI tools suite for developers",
   icons: {
     icon: "/favicon.ico",
-    apple: "/app/favicon-for-app", // Assuming this is an apple-touch-icon
+    apple: "/app/favicon-for-app",
   },
-  // verification: {
-  //   google: "google54af04aef387e2db",
-  // },
-  
+  verification: {
+    google: "google54af04aef387e2db",
+  },
   other: {
     "apple-mobile-web-app-title": "devcortexai",
   },
@@ -143,19 +193,6 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "DevCortex.ai",
-              url: "https://www.devcortexai.me/",
-            }),
-          }}
-        />
-      </head>
       <body className="bg-black text-white font-sans antialiased">
         <Navbar />
         <main className="mt-20">{children}</main>
