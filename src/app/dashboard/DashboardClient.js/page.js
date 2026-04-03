@@ -1,4 +1,4 @@
-
+"use client";
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -51,20 +51,7 @@ const tools = [  {
 export default function DashboardClient() {
   return (
    <>
-      <Head>
-        <title>
-          AI Tools Dashboard | Code Fixer, Summarizer, JSON Formatter, Image
-          Optimizer & API Tester
-        </title>
-        <meta
-          name="description"
-          content="Free AI tools for developers: Fix code errors, summarize text, format JSON, optimize images, and test APIs instantly."
-        />
-        <meta
-          name="keywords"
-          content="AI tools, code fixer, JSON formatter, text summarizer, image optimizer, API tester, developer tools"
-        />
-      </Head>
+ 
 
       <div className="min-h-screen bg-[#020617] text-gray-100 pt-24 pb-16 px-4 sm:px-6 font-sans selection:bg-indigo-500/30">
         {/* Background glow */}

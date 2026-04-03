@@ -1475,3 +1475,11 @@
 //     </div>
 //   );
 // }
+
+export default function PdfToDocxPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-slate-200">
+      PDF to DOCX tool is temporarily disabled.
+    </div>
+  );
+}

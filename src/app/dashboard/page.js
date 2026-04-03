@@ -1,7 +1,5 @@
 
-"use client";
 import React from "react";
-import Head from "next/head";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -77,6 +75,20 @@ export default function Dashboard() {
   return (
     <>
       <Head>
+        <title>
+          AI Tools Dashboard | Code Fixer, Summarizer, JSON Formatter, Image
+          Optimizer & API Tester
+        </title>
+        <meta
+          name="description"
+          content="Free AI tools for developers: Fix code errors, summarize text, format JSON, optimize images, and test APIs instantly."
+        />
+        <meta
+          name="keywords"
+          content="AI tools, code fixer, JSON formatter, text summarizer, image optimizer, API tester, developer tools"
+        />
+      </Head>
+           <Head>
         <title>
           AI Tools Dashboard | Code Fixer, Summarizer, JSON Formatter, Image
           Optimizer & API Tester

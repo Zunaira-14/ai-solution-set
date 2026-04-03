@@ -446,3 +446,10 @@
 //     </div>
 //   );
 // }
+export default function ImageToolPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-slate-200">
+      Image tool is temporarily disabled.
+    </div>
+  );
+}
