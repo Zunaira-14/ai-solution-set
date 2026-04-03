@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Custom ignores for project-specific directories
+image-generate/
+pdf-to-docx/
+image-tool/
