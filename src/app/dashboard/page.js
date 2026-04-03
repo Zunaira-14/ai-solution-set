@@ -10,6 +10,8 @@ import {
   Code2,
   Zap,
   ArrowRight,
+  Sparkles,
+
 } from "lucide-react";
 
 const tools = [  {
@@ -46,6 +48,13 @@ const tools = [  {
     icon: <Zap className="w-5 h-5 text-sky-300" />,
     color: "from-sky-500/40 via-sky-500/10 to-transparent",
     link: "/dashboard/api-tester",
+  },
+  {
+    name: "AI Content Humanizer",
+    desc: "Make AI text sound natural and human.",
+    icon: <Sparkles className="w-5 h-5 text-yellow-300" />,
+    color: "from-yellow-500/40 via-yellow-500/10 to-transparent",
+    link: "/dashboard/humanizeContex",
   },
 ];
 
