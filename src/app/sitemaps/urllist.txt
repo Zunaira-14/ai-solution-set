@@ -1,0 +1,10 @@
+https://www.devcortexai.me/
+https://www.devcortexai.me/dashboard
+https://www.devcortexai.me/dashboard/code-fixer
+https://www.devcortexai.me/dashboard/summarizer
+https://www.devcortexai.me/dashboard/json-tool
+https://www.devcortexai.me/dashboard/image-tool
+https://www.devcortexai.me/dashboard/api-tester
+https://www.devcortexai.me/dashboard/humanizeContex
+https://www.devcortexai.me/dashboard/image-generator
+https://www.devcortexai.me/dashboard/pdf-to-docx

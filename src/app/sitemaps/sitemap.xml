@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://www.devcortexai.me/</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/code-fixer</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/summarizer</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/json-tool</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/image-tool</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/api-tester</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/humanizeContex</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/image-generator</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.devcortexai.me/dashboard/pdf-to-docx</loc>
+  <lastmod>2026-04-03T10:29:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+
+</urlset>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:ror="http://rorweb.com/0.1/" >
+<channel>
+  <title>ROR Sitemap for https://www.devcortexai.me/</title>
+  <link>https://www.devcortexai.me/</link>
+
+<item>
+     <link>https://www.devcortexai.me/</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>0</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/code-fixer</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/summarizer</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/json-tool</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/image-tool</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/api-tester</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/humanizeContex</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/image-generator</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.devcortexai.me/dashboard/pdf-to-docx</link>
+     <title>DevCortex.ai</title>
+     <description>AI tools suite for developers</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+</channel>
+</rss>
+  
