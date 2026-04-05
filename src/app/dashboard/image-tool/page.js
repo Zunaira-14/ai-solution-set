@@ -1,5 +1,6 @@
 // src/app/dashboard/image-tool/page.js
-import ImageOptimizerClient from "./imagr-toolClient";
+
+import ImageOptimizer from "./imageoptimizer";
 
 export const metadata = {
   title:
@@ -37,5 +38,5 @@ export const metadata = {
 };
 
 export default function ImageOptimizerPage() {
-  return <ImageOptimizerClient />;
+  return <ImageOptimizer/>;
 }
