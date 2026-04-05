@@ -1,6 +1,6 @@
-// src/app/dashboard/image-tool/page.js
+// src/app/dashboard/image-optimizer/page.js
 
-import ImageOptimizer from "./ImageOptimizerClient";
+import ImageOptimizerClient from "./ImageOptimizerClient";
 
 export const metadata = {
   title:
@@ -22,7 +22,7 @@ export const metadata = {
       "Image Optimizer | Compress & Convert Images for Web – DevCortex.ai",
     description:
       "Reduce image size by up to 90% while keeping visual quality sharp. Compress and convert images directly in your browser for faster-loading sites.",
-    url: "https://devcortex.ai/dashboard/image-tool",
+    url: "https://www.devcortexai.me/dashboard/image-optimizer",
     type: "website",
   },
   twitter: {
@@ -33,11 +33,10 @@ export const metadata = {
       "Compress and convert images to WebP/JPG in the browser to boost performance and SEO.",
   },
   alternates: {
-    canonical: "https://devcortex.ai/dashboard/image-tool",
+    canonical: "https://www.devcortexai.me/dashboard/image-optimizer",
   },
 };
 
 export default function ImageOptimizerPage() {
   return 
-<ImageOptimizer/>;
-}
+<ImageOptimizerClient/>}

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import imageCompression from "browser-image-compression";
 
-export default function ImageOptimizer() {
+export default function ImageOptimizerClient() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [compressedFile, setCompressedFile] = useState(null);
   const [loading, setLoading] = useState(false);
