@@ -1,6 +1,6 @@
 // src/app/dashboard/image-tool/page.js
 
-import ImageOptimizer from "./imageoptimizer";
+import ImageOptimizer from "./ImageOptimizerClient";
 
 export const metadata = {
   title:
