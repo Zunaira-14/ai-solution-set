@@ -9,7 +9,7 @@ const tools = [
   { name: "Code Fixer", href: "/dashboard/code-fixer" },
   { name: "Smart Summarizer", href: "/dashboard/summarizer" },
   { name: "JSON Formatter", href: "/dashboard/json-tool" },
-  { name: "Image Optimizer", href: "/dashboard/image-tool" },
+  { name: "Image Optimizer", href: "/dashboard/image-optimizer" },
   { name: "API Tester", href: "/dashboard/api-tester" },
   // { name: "Image Generator", href: "/dashboard/image-generator" },
   // { name: "PDF to DOCX", href: "/dashboard/pdf-to-docx" },

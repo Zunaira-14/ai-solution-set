@@ -59,7 +59,7 @@ export default function Footer() {
                 JSON Formatter
               </Link>
               <Link
-                href="/dashboard/image-tool"
+                href="/dashboard/image-optimizer"
                 className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
               >
                 <ArrowRight className="w-3 h-3" />

@@ -40,7 +40,7 @@ const tools = [  {
     desc: "Compress images for better speed and SEO.",
     icon: <ImageIcon className="w-5 h-5 text-emerald-300" />,
     color: "from-emerald-500/40 via-emerald-500/10 to-transparent",
-    link: "/dashboard/image-tool",
+    link: "/dashboard/image-optimizer",
   },
   {
     name: "API Tester",
