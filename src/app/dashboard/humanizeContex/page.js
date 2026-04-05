@@ -19,7 +19,7 @@ export const metadata = {
     title: "AI Content Humanizer | Make AI Text Sound Natural – DevCortex.ai",
     description:
       "Paste AI-generated content and instantly humanize it with adjustable tone. Perfect for blogs, emails, and professional writing.",
-    url: "https://devcortex.ai/dashboard/humanizeContex",
+    url: "https://www.devcortexai.me/dashboard/humanizeContex",
     type: "website",
   },
   twitter: {
